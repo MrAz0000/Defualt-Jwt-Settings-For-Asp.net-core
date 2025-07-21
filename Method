@@ -1,0 +1,31 @@
+// a method to generate a token
+private async Task<string> GenerateTokekn(ApiUserIdentity user) 
+{
+    if (!ModelState.IsValid)
+    {
+        return null;
+    }
+    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.
+            GetBytes(_config["JwtSettings:Key"]!));
+
+
+    var claims = new List<Claim>
+    {
+        new Claim(JwtRegisteredClaimNames.Sub , user.UserName!),
+        new Claim(JwtRegisteredClaimNames.Jti , Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Email , user.Email!),
+        new Claim("uid", user.Id)
+    };
+
+    var credential = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+    var token = new JwtSecurityToken(
+        issuer: _config["JwtSettings:Issuer"],
+        audience: _config["JwtSettings:Audince"],
+        claims: claims,
+        expires: DateTime.Now.AddMinutes(5),
+        signingCredentials: credential
+        );
+
+    return new JwtSecurityTokenHandler().WriteToken(token);
+}
