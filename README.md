@@ -1,0 +1,1 @@
+# Defualt-Jwt-Settings-For-Asp.net-core
